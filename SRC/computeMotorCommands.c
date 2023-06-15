@@ -90,12 +90,13 @@ float autoPan(float motorPos, float setpoint)
 
 void computeMotorCommands(float dt)
 {
+	static float jiaodu;
     holdIntegrators = false;//启用积分作用
 
     ///////////////////////////////////
 
     //if (eepromConfig.rollEnabled == true)//如果使能了 滚转轴（ROLL）
-    if (1)//如果使能了 滚转轴（ROLL）
+    if (1)//如果使能了 滚转轴（ROLL） 
     {
 		//更新PID，结果放到pidCmd[ROLL]
         pidCmd[ROLL] = updatePID(pointingCmd[ROLL] * mechanical2electricalDegrees[ROLL],
@@ -114,7 +115,14 @@ void computeMotorCommands(float dt)
 
         pidCmdPrev[ROLL] = pidCmd[ROLL];//保存本次PID输出结果到 pidCmdPrev[ROLL] 作为旧的值（相对于下次）。
 
-        setRollMotor(pidCmd[ROLL], (int)eepromConfig.rollPower);
+        //setRollMotor(pidCmd[ROLL], (int)eepromConfig.rollPower);
+		
+		jiaodu+=0.01;
+		if(jiaodu>=6.28)
+		{
+			jiaodu=0;
+		}
+        setRollMotor(jiaodu, 55.0);
     }
 
     ///////////////////////////////////

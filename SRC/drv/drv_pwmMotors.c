@@ -315,7 +315,7 @@ static void timerPWMadvancedConfig(TIM_TypeDef *tim)
     TIM_BDTRConfig(tim, &TIM_BDTRInitStructure);
 
     //Configuration in PWM mode
-    TIM_OCInitStructure.TIM_OCMode       = TIM_OCMode_PWM1 ;
+    TIM_OCInitStructure.TIM_OCMode       = TIM_OCMode_PWM2 ;
     TIM_OCInitStructure.TIM_OutputState  = TIM_OutputState_Enable;
     TIM_OCInitStructure.TIM_OutputNState = TIM_OutputNState_Enable;
     TIM_OCInitStructure.TIM_Pulse        = 0;
@@ -364,7 +364,8 @@ void setPWMFastTable(int *pwm, float angle, float power)
         angle = testPhase;
     }
 
-     angleInt = (int)round(angle / M_TWOPI * SINARRAYSIZE);
+     //angleInt = (int)round(angle / M_TWOPI * SINARRAYSIZE);
+     angleInt = (int)(angle / M_TWOPI * SINARRAYSIZE);
 
     angleInt = angleInt % SINARRAYSIZE;
 
@@ -486,8 +487,8 @@ void setRollMotor(float phi, int power)
 {
     int pwm[3];
 
-    //setPWM(pwm, phi, power);
-    setPWM(pwm, 90, 50);
+    setPWM(pwm, phi, power);
+//    setPWM(pwm, 90, 50);
     setPWMData(rollPhase, pwm);
     activateIRQ(TIM8);
 }
@@ -575,10 +576,10 @@ void pwmMotorDriverInit(void)
 
     __disable_irq_nested();
     {
-//        vu32 *tim8Enable = BB_PERIPH_ADDR(&(TIM8->CR1), 0);
-//        *tim8Enable = 1;
-			  TIM_Cmd(TIM8, ENABLE);
-        TIM_CtrlPWMOutputs(TIM8, ENABLE);
+//		vu32 *tim8Enable = BB_PERIPH_ADDR(&(TIM8->CR1), 0);
+//		*tim8Enable = 1;
+		TIM_Cmd(TIM8, ENABLE);
+		TIM_CtrlPWMOutputs(TIM8, ENABLE);
     }
     __enable_irq_nested();
 
