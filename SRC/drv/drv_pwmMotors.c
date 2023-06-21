@@ -36,6 +36,9 @@
 
 #include "board.h"
 #include "stm32f10x.h"
+//#include <math.h>
+//#include <stdio.h>
+//#pragma comment(lib, "m")
 ///////////////////////////////////////////////////////////////////////////////
 
 // TIM8 Roll
@@ -357,15 +360,14 @@ static void timerPWMgeneralConfig(TIM_TypeDef *tim, int polarity)
 
 void setPWMFastTable(int *pwm, float angle, float power)
 {
-	 int iPower;
-	int angleInt ;
-    if (testPhase >= 0)
-    {
-        angle = testPhase;
+	int iPower;  			
+	int angleInt; 			
+    if (testPhase >= 0) 	
+    {						
+        angle = testPhase;	
     }
 
-     //angleInt = (int)round(angle / M_TWOPI * SINARRAYSIZE);
-     angleInt = (int)(angle / M_TWOPI * SINARRAYSIZE);
+	angleInt = (int)round(angle / M_TWOPI * SINARRAYSIZE);
 
     angleInt = angleInt % SINARRAYSIZE;
 
@@ -375,7 +377,7 @@ void setPWMFastTable(int *pwm, float angle, float power)
     }
 
     //int iPower = 5 * (int)power;
-     iPower = (int)((PWM_PERIOD / 2 - timer4timer5deadTimeDelay)  * power / 100);
+	iPower = (int)((PWM_PERIOD / 2 - timer4timer5deadTimeDelay)  * power / 100);
 
     pwm[0] = (sinDataI16[ angleInt                               % SINARRAYSIZE] * iPower + SINARRAYSCALE / 2) / SINARRAYSCALE + PWM_PERIOD / 2;
     pwm[1] = (sinDataI16[(angleInt +  1 * SINARRAYSIZE / 3)      % SINARRAYSIZE] * iPower + SINARRAYSCALE / 2) / SINARRAYSCALE + PWM_PERIOD / 2;
@@ -485,12 +487,11 @@ void activateIRQ(TIM_TypeDef *tim)
 
 void setRollMotor(float phi, int power)
 {
-    int pwm[3];
-
+    int pwm[3];				
+							
     setPWM(pwm, phi, power);
-//    setPWM(pwm, 90, 50);
     setPWMData(rollPhase, pwm);
-    activateIRQ(TIM8);
+    activateIRQ(TIM8);			
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -545,8 +546,6 @@ void pwmMotorDriverInit(void)
         // make sure this init function is not called twice
         return;
     }
-
-    
 
     ///////////////////////////////////
 

@@ -282,7 +282,7 @@ void systemInit(void)
     gpioInit();
 /**/
     LED2_ON;
-/**
+/**/
     delay(1000);  // 10 seconds of 20 second delay for sensor stabilization
 
     if (GetVCPConnectMode() != eVCPConnectReset)
@@ -301,7 +301,7 @@ void systemInit(void)
         delay(3000);
         cliPrintF("\r\nBGC32 firmware starting up, serial active...\r\n");
     }
-**/
+/**/
 #if defined(__DATE__) && defined(__TIME__)
     cliPrintF("\nBGC32 Firmware V%s, Build Date " __DATE__ " "__TIME__" \n", __BGC32_VERSION);
 #endif
@@ -315,7 +315,7 @@ void systemInit(void)
         cliPrintF("\nERROR: Running on internal HSI clock, clock rate is %dMHz\n", SystemCoreClock / 1000000);
     }
 
-    //delay(1000);  // Remaining 10 seconds of 20 second delay for sensor stabilization - probably not long enough..
+     delay(1000);  // Remaining 10 seconds of 20 second delay for sensor stabilization - probably not long enough..
 
     LED1_ON;
 

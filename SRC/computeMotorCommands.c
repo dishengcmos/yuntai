@@ -95,8 +95,8 @@ void computeMotorCommands(float dt)
 
     ///////////////////////////////////
 
-    //if (eepromConfig.rollEnabled == true)//如果使能了 滚转轴（ROLL）
-    if (1)//如果使能了 滚转轴（ROLL） 
+    if (eepromConfig.rollEnabled == true)//如果使能了 滚转轴（ROLL）
+//	if (1)//如果使能了 滚转轴(ROLL)
     {
 		//更新PID，结果放到pidCmd[ROLL]
         pidCmd[ROLL] = updatePID(pointingCmd[ROLL] * mechanical2electricalDegrees[ROLL],
@@ -106,23 +106,23 @@ void computeMotorCommands(float dt)
 		//当前PID输出减去上次PID输出得到变化量
         outputRate[ROLL] = pidCmd[ROLL] - pidCmdPrev[ROLL];
 
-        if (outputRate[ROLL] > eepromConfig.rateLimit)//如果变化量大于旋转速度限制的最大值
-            pidCmd[ROLL] = pidCmdPrev[ROLL] + eepromConfig.rateLimit;//那么使用上次PID输出结果+旋转速度限制的最大值 作为本次PID结果
-
+        if (outputRate[ROLL] > eepromConfig.rateLimit)//如果变化量大于旋转速度限制的最大值	
+            pidCmd[ROLL] = pidCmdPrev[ROLL] + eepromConfig.rateLimit;//那么使用上次PID输出结果+旋转速度限制的最大值 作为本次PID结果	
+			
         if (outputRate[ROLL] < -eepromConfig.rateLimit)//如果变化量小于旋转速度限制的最小值
             pidCmd[ROLL] = pidCmdPrev[ROLL] - eepromConfig.rateLimit;//那么使用上次PID输出结果-旋转速度限制的最小值（减去一个负数
 					//	相当于加上这个数的正值），作为本次PID结果
-
-        pidCmdPrev[ROLL] = pidCmd[ROLL];//保存本次PID输出结果到 pidCmdPrev[ROLL] 作为旧的值（相对于下次）。
-
-        //setRollMotor(pidCmd[ROLL], (int)eepromConfig.rollPower);
 		
-		jiaodu+=0.01;
-		if(jiaodu>=6.28)
-		{
-			jiaodu=0;
-		}
-        setRollMotor(jiaodu, 55.0);
+        pidCmdPrev[ROLL] = pidCmd[ROLL];//保存本次PID输出结果到 pidCmdPrev[ROLL] 作为旧的值（相对于下次）。
+		
+        setRollMotor(pidCmd[ROLL], (int)eepromConfig.rollPower);
+		
+//		jiaodu+=0.01;
+//		if(jiaodu>=30.14)
+//		{
+//			jiaodu=0;
+//		}
+//        setRollMotor(3.14, 55.0);
     }
 
     ///////////////////////////////////

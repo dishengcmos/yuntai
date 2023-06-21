@@ -50,9 +50,8 @@ void initSinArray(void)
 
     for (i = 0; i < SINARRAYSIZE; i++)
     {
-        float x = i * M_TWOPI / SINARRAYSIZE;
-        //sinDataI16[i] = (short int)round(sinf(x) * SINARRAYSCALE);
-        sinDataI16[i] = (short int)(sinf(x) * SINARRAYSCALE);
+        float x = i * M_TWOPI / SINARRAYSIZE; 
+        sinDataI16[i] = (short int)round(sinf(x) * SINARRAYSCALE);
     }
 }
 
