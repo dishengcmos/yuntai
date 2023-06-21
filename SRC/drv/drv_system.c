@@ -268,11 +268,9 @@ void systemInit(void)
 #ifdef _DTIMING
     timingSetup();
 #endif
-
     ///////////////////////////////////////////////////////////////////////////
-
-    checkFirstTime(false);
-    readEEPROM();
+    checkFirstTime(true);
+    // readEEPROM();
 
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);  // 2 bits for pre-emption priority, 2 bits for subpriority
 

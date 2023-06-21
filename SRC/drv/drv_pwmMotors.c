@@ -63,39 +63,40 @@
 // PA8,  PA9,  PA10 used for Pitch,  TIM_OCPolarity_High
 // PB13, PB14, PB15 used for PitchN, TIM_OCPolarity_High
 
-#define PITCH_A_GPIO    GPIOA
-#define PITCH_A_PIN     GPIO_Pin_8
-#define PITCH_B_GPIO    GPIOA
-#define PITCH_B_PIN     GPIO_Pin_9
-#define PITCH_C_GPIO    GPIOA
-#define PITCH_C_PIN     GPIO_Pin_10
+#define YAW_A_GPIO    GPIOA
+#define YAW_A_PIN     GPIO_Pin_8
+#define YAW_B_GPIO    GPIOA
+#define YAW_B_PIN     GPIO_Pin_9
+#define YAW_C_GPIO    GPIOA
+#define YAW_C_PIN     GPIO_Pin_10
 
-#define PITCH_AN_GPIO   GPIOB
-#define PITCH_AN_PIN    GPIO_Pin_13
-#define PITCH_BN_GPIO   GPIOB
-#define PITCH_BN_PIN    GPIO_Pin_14
-#define PITCH_CN_GPIO   GPIOB
-#define PITCH_CN_PIN    GPIO_Pin_15
+#define YAW_AN_GPIO   GPIOB
+#define YAW_AN_PIN    GPIO_Pin_13
+#define YAW_BN_GPIO   GPIOB
+#define YAW_BN_PIN    GPIO_Pin_14
+#define YAW_CN_GPIO   GPIOB
+#define YAW_CN_PIN    GPIO_Pin_15
 
-// TIM5 Yaw
+
+// TIM5 Pitch
 // PA0, PA1, PA2 used for Yaw,  TIM_OCPolarity_High
 
-#define YAW_A_GPIO     GPIOA
-#define YAW_A_PIN      GPIO_Pin_0
-#define YAW_B_GPIO     GPIOA
-#define YAW_B_PIN      GPIO_Pin_1
-#define YAW_C_GPIO     GPIOA
-#define YAW_C_PIN      GPIO_Pin_2
+#define PITCH_A_GPIO     GPIOA
+#define PITCH_A_PIN      GPIO_Pin_1
+#define PITCH_B_GPIO     GPIOA
+#define PITCH_B_PIN      GPIO_Pin_2
+#define PITCH_C_GPIO     GPIOA
+#define PITCH_C_PIN      GPIO_Pin_3
 
-// TIM4 YawN
-// PB6, PB7, PB8 used for YawN, TIM_OCPolarity_Low
+// TIM4 PITCHN
+// PB6, PB7, PB8 used for PITCHN, TIM_OCPolarity_Low
 
-#define YAW_AN_GPIO    GPIOB
-#define YAW_AN_PIN     GPIO_Pin_6
-#define YAW_BN_GPIO    GPIOB
-#define YAW_BN_PIN     GPIO_Pin_7
-#define YAW_CN_GPIO    GPIOB
-#define YAW_CN_PIN     GPIO_Pin_8
+#define PITCH_AN_GPIO    GPIOB
+#define PITCH_AN_PIN     GPIO_Pin_6
+#define PITCH_BN_GPIO    GPIOB
+#define PITCH_BN_PIN     GPIO_Pin_7
+#define PITCH_CN_GPIO    GPIOB
+#define PITCH_CN_PIN     GPIO_Pin_8
 
 ///////////////////////////////////////
 
@@ -208,9 +209,9 @@ void TIM1_UP_IRQHandler(void) // pitch axis
         // make sure there is enough time to make all changes
         if (eepromConfig.pitchEnabled)
         {
-            TIM1->CCR1 = pitchPhase[0];
-            TIM1->CCR2 = pitchPhase[1];
-            TIM1->CCR3 = pitchPhase[2];
+            TIM1->CCR1 = yawPhase[0];
+            TIM1->CCR2 = yawPhase[1];
+            TIM1->CCR3 = yawPhase[2];
         }
         else
         {
@@ -228,7 +229,42 @@ void TIM1_UP_IRQHandler(void) // pitch axis
 ///////////////////////////////////////////////////////////////////////////////
 //  TIM5 IRQ Handler (YAW)
 ///////////////////////////////////////////////////////////////////////////////
+void TIM5_IRQHandler(void) // yaw axis
+{	
+		unsigned short cnt ;
+    if (TIM5->SR & TIM_SR_UIF) // if UIF flag is set
+    {
+        TIM5->SR &= ~TIM_SR_UIF; // clear UIF flag
 
+        __disable_irq_nested();
+        cnt = TIM5->CNT;
+        updateCounter(PITCH, cnt);
+
+        if (cnt < MAX_CNT)
+        {
+            // make sure there is enough time to make all changes
+            if (eepromConfig.pitchEnabled)
+            {
+                TIM5->CCR2 = pitchPhase[0];
+                TIM5->CCR3 = pitchPhase[1];
+                TIM5->CCR4 = pitchPhase[2];
+            }
+            else
+            { 
+                TIM5->CCR2 = 0;
+                TIM5->CCR3 = 0;
+                TIM5->CCR4 = 0;
+            }
+
+            TIM5->DIER &= ~TIM_DIER_UIE;  // disable update interrupt
+        }
+
+        __enable_irq_nested();
+    }
+}
+
+
+/***
 void TIM5_IRQHandler(void) // yaw axis
 {	
 		unsigned short cnt ;
@@ -271,7 +307,7 @@ void TIM5_IRQHandler(void) // yaw axis
         __enable_irq_nested();
     }
 }
-
+***/
 ///////////////////////////////////////////////////////////////////////////////
 //  Timer Channel Configuration
 ///////////////////////////////////////////////////////////////////////////////
@@ -285,6 +321,16 @@ static void timerChannelConfig(TIM_TypeDef *tim, TIM_OCInitTypeDef *OCInitStruct
     TIM_OC1PreloadConfig(tim, TIM_OCPreload_Enable);
     TIM_OC2PreloadConfig(tim, TIM_OCPreload_Enable);
     TIM_OC3PreloadConfig(tim, TIM_OCPreload_Enable);
+}
+static void timerChanne5Config(TIM_TypeDef *tim, TIM_OCInitTypeDef *OCInitStructure)
+{ 
+    TIM_OC2Init(tim, OCInitStructure);
+    TIM_OC3Init(tim, OCInitStructure);
+    TIM_OC4Init(tim, OCInitStructure);
+ 
+    TIM_OC2PreloadConfig(tim, TIM_OCPreload_Enable);
+    TIM_OC3PreloadConfig(tim, TIM_OCPreload_Enable);
+    TIM_OC4PreloadConfig(tim, TIM_OCPreload_Enable);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -342,7 +388,7 @@ static void timerPWMgeneralConfig(TIM_TypeDef *tim, int polarity)
     TIM_TimeBaseInitStructure.TIM_Prescaler     = (4 - 1);                 // 72 Mhz / (3 + 1) = 18 MHz
     TIM_TimeBaseInitStructure.TIM_CounterMode   = TIM_CounterMode_Up;
     TIM_TimeBaseInitStructure.TIM_Period        = PWM_PERIOD - 1;          // 18 Mhz / 1000 = 18 kHz
-    TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV4;
+    TIM_TimeBaseInitStructure.TIM_ClockDivision = 0;//TIM_CKD_DIV4;
 
     TIM_TimeBaseInit(tim, &TIM_TimeBaseInitStructure);
 
@@ -351,7 +397,7 @@ static void timerPWMgeneralConfig(TIM_TypeDef *tim, int polarity)
     TIM_OCInitStructure.TIM_Pulse       = 0;
     TIM_OCInitStructure.TIM_OCPolarity  = polarity;
 
-    timerChannelConfig(tim, &TIM_OCInitStructure);
+    timerChanne5Config(tim, &TIM_OCInitStructure);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -488,7 +534,6 @@ void activateIRQ(TIM_TypeDef *tim)
 void setRollMotor(float phi, int power)
 {
     int pwm[3];				
-							
     setPWM(pwm, phi, power);
     setPWMData(rollPhase, pwm);
     activateIRQ(TIM8);			
@@ -501,10 +546,9 @@ void setRollMotor(float phi, int power)
 void setPitchMotor(float theta, int power)
 {
     int pwm[3];
-
     setPWM(pwm, theta, power);
     setPWMData(pitchPhase, pwm);
-    activateIRQ(TIM1);
+    activateIRQ(TIM5);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -513,12 +557,10 @@ void setPitchMotor(float theta, int power)
 
 void setYawMotor(float psi, int power)
 {
-    int pwm[3];
-
-    setPWM(pwm, psi, power);
-    limitYawPWM(pwm);
-    setPWMData(yawPhase, pwm);
-    activateIRQ(TIM5);
+//    int pwm[3];
+//    setPWM(pwm, psi, power);
+//    setPWMData(pitchPhase, pwm);
+//    activateIRQ(TIM5);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -584,15 +626,15 @@ void pwmMotorDriverInit(void)
 
 
     ///////////////////////////////////
-    // Pitch PWM Timer Initialization here
+    // Yaw PWM Timer Initialization here
 
     GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AF_PP;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
 
-    GPIO_InitStructure.GPIO_Pin   = PITCH_A_PIN | PITCH_B_PIN | PITCH_C_PIN;
+    GPIO_InitStructure.GPIO_Pin   = YAW_A_PIN | YAW_B_PIN | YAW_C_PIN;
     GPIO_Init(GPIOA, &GPIO_InitStructure);
 
-    GPIO_InitStructure.GPIO_Pin   = PITCH_AN_PIN | PITCH_BN_PIN | PITCH_CN_PIN;
+    GPIO_InitStructure.GPIO_Pin   = YAW_AN_PIN | YAW_BN_PIN | YAW_CN_PIN;
     GPIO_Init(GPIOB, &GPIO_InitStructure);
 
     irqCnt[PITCH] = 0;
@@ -621,15 +663,15 @@ void pwmMotorDriverInit(void)
     GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AF_PP;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
 
-    GPIO_InitStructure.GPIO_Pin   = YAW_A_PIN | YAW_B_PIN | YAW_C_PIN;
+    GPIO_InitStructure.GPIO_Pin   = PITCH_A_PIN | PITCH_B_PIN | PITCH_C_PIN;
     GPIO_Init(GPIOA, &GPIO_InitStructure);
 
     GPIO_InitStructure.GPIO_Pin   = YAW_AN_PIN | YAW_BN_PIN | YAW_CN_PIN;
     GPIO_Init(GPIOB, &GPIO_InitStructure);
 
-    irqCnt[YAW] = 0;
-    maxCnt[YAW] = 0;
-    minCnt[YAW] = PWM_PERIOD + 1;
+    irqCnt[PITCH] = 0;
+    maxCnt[PITCH] = 0;
+    minCnt[PITCH] = PWM_PERIOD + 1;
 
     timerPWMgeneralConfig(TIM5, TIM_OCPolarity_High);
     timerPWMgeneralConfig(TIM4, TIM_OCPolarity_Low);
@@ -638,14 +680,10 @@ void pwmMotorDriverInit(void)
 
     __disable_irq_nested();
     {
-//        vu32 *tim5Enable = BB_PERIPH_ADDR(&(TIM5->CR1), 0);
-//        vu32 *tim4Enable = BB_PERIPH_ADDR(&(TIM4->CR1), 0);
-
-        TIM4->CNT = timer4timer5deadTimeDelay;
-//        *tim5Enable = 1;
-//        *tim4Enable = 1;
-				TIM_Cmd(TIM4, ENABLE);
-			  TIM_Cmd(TIM5, ENABLE);
+        TIM5->CNT = timer4timer5deadTimeDelay + 3 + PWM_PERIOD / 3;
+ 
+		TIM_Cmd(TIM4, ENABLE);
+		TIM_Cmd(TIM5, ENABLE);
 			
         TIM_CtrlPWMOutputs(TIM5, ENABLE);
         TIM_CtrlPWMOutputs(TIM4, ENABLE);

@@ -158,9 +158,9 @@ void checkFirstTime(bool eepromReset)
         ///////////////////////////////
 
         eepromConfig.PID[ROLL_PID].B               =    1.0f;
-        eepromConfig.PID[ROLL_PID].P               =   10.0f;
-        eepromConfig.PID[ROLL_PID].I               =    5.0f;
-        eepromConfig.PID[ROLL_PID].D               =    0.1f;
+        eepromConfig.PID[ROLL_PID].P               =    1.2f;
+        eepromConfig.PID[ROLL_PID].I               =    0.3f;
+        eepromConfig.PID[ROLL_PID].D               =    0.001f;
         eepromConfig.PID[ROLL_PID].iTerm           =    0.0f;
         eepromConfig.PID[ROLL_PID].windupGuard     = 1000.0f;  // PWMs
         eepromConfig.PID[ROLL_PID].lastDcalcValue  =    0.0f;
@@ -170,9 +170,9 @@ void checkFirstTime(bool eepromReset)
         eepromConfig.PID[ROLL_PID].type            =    OTHER;
 
         eepromConfig.PID[PITCH_PID].B              =    1.0f;
-        eepromConfig.PID[PITCH_PID].P              =    2.5f;
-        eepromConfig.PID[PITCH_PID].I              =    5.0f;
-        eepromConfig.PID[PITCH_PID].D              =    0.05f;
+        eepromConfig.PID[PITCH_PID].P              =    0.5f;
+        eepromConfig.PID[PITCH_PID].I              =    1.0f;
+        eepromConfig.PID[PITCH_PID].D              =    0.005f;
         eepromConfig.PID[PITCH_PID].iTerm          =    0.0f;
         eepromConfig.PID[PITCH_PID].windupGuard    = 1000.0f;  // PWMs
         eepromConfig.PID[PITCH_PID].lastDcalcValue =    0.0f;
@@ -198,7 +198,7 @@ void checkFirstTime(bool eepromReset)
         eepromConfig.yawPower     = 55.0f;
 
         eepromConfig.rollEnabled  = true;
-        eepromConfig.pitchEnabled = false;
+        eepromConfig.pitchEnabled = true;
         eepromConfig.yawEnabled   = false;
 
         eepromConfig.rollAutoPanEnabled  = false;

@@ -153,6 +153,16 @@
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
+          <ItemText>pidCmd</ItemText>
+        </Ww>
+        <Ww>
+          <count>1</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>pitchPhase,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>2</count>
+          <WinNumber>1</WinNumber>
           <ItemText>rollPhase,0x0A</ItemText>
         </Ww>
       </WatchWindow1>
