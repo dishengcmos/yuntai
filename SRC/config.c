@@ -158,9 +158,9 @@ void checkFirstTime(bool eepromReset)
         ///////////////////////////////
 
         eepromConfig.PID[ROLL_PID].B               =    1.0f;
-        eepromConfig.PID[ROLL_PID].P               =    1.2f;
-        eepromConfig.PID[ROLL_PID].I               =    0.3f;
-        eepromConfig.PID[ROLL_PID].D               =    0.001f;
+        eepromConfig.PID[ROLL_PID].P               =    1.5f;
+        eepromConfig.PID[ROLL_PID].I               =    0.5f;
+        eepromConfig.PID[ROLL_PID].D               =    0.01f;
         eepromConfig.PID[ROLL_PID].iTerm           =    0.0f;
         eepromConfig.PID[ROLL_PID].windupGuard     = 1000.0f;  // PWMs
         eepromConfig.PID[ROLL_PID].lastDcalcValue  =    0.0f;
